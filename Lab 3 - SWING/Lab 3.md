@@ -1,165 +1,31 @@
+# Lab 3
 # Створення GUI з допомогою Swing
-Мета роботи - навчитись створювати прості графічні інтерфейси з допомогою **Swing**.
+Мета роботи - навчитись створювати прості графічні інтерфейси з допомогою [Swing](https://uk.wikipedia.org/wiki/Swing_(Java)).
 
-Для початку продемонструю початкову роботу програми
+![Demo](https://github.com/ppc-ntu-khpi/GUI-Lab1-Starter/blob/master/Lab%203%20-%20SWING/GUI-Lab-3.PNG)
 
-![](https://github.com/ppc-ntu-khpi/34-gui-1-katushhiaa/blob/master/first_work.jpg "First Work")
+Допоміжні матеріали:
+ - [Документація](https://docs.oracle.com/javase/7/docs/api/javax/swing/package-summary.html)
+ - [Навчальні матеріали](https://docs.oracle.com/javase/tutorial/uiswing/index.html)
+ - [Репозиторій](https://github.com/liketaurus/OOP-JAVA) з классами з усіх попередніх лаб (завдання 'Banking')
 
-## Завдання на "п'ять"
-1. Додайте ще одну кнопку - *Report*, яка має виводити у нижній частині вікна звіт за клієнтами
+Ви можете обрати завдання на бажану оцінку - три, чотири або п'ять. *УВАГА! Завдання "на чотири" та "на п'ять" потребують виконання завдання "на три"!*
+## На "трійку"
+1. Завантажте jar-файл з усіма потрібними классами (*Bank, Customer, Account* та ін.) з наших попередніх лаб - [MyBank](https://github.com/ppc-ntu-khpi/GUI-Lab1-Starter/blob/master/jars/MyBank.jar)
+2. Створіть в Netbeans новий проект з назвою GUIdemo (або використайте проект, створений в ході виконання попередньої роботи). *УВАГА! Чекбокс *Create Main Class* треба **очистити** (**не створювати виконуваний клас**)!*
+3. Додайте до проекту завантажену вами бібліотеку - правою кнопкой на проекті, обрати *Properties*, потім у дереві категорій обрати *Libraries* (другий пункт зверху), натиснути у правій частині вікна кнопку *Add JAR/Folder*, обрати jar-файл, завантажений у п. 1, натиснути *Ok*
+4. Додайте до проекту файл **[SWINGdemo.java](https://github.com/ppc-ntu-khpi/GUI-Lab1-Starter/blob/master/Lab%203%20-%20SWING/SWINGDemo.java)** з цього репозиторію
+5. Вивчіть вихідний код у файлі, впевніться, що ви розумієте як він має працювати
+6. Запустіть проект у звичайний спосіб. Ви маєте побачити вікно, в якому можна обрати одного з клієнтів банку, і натиснувши кнопку *Show*, побачити інформацію про нього. Продемонстрируйте результат викладачеві.
+
+## На "чотири"
+1. Перепишіть код  так, щоб інформація про клієнтів банку та їх рахунки читалась з файлу **test.dat** (робота номер 8, [файл даних](https://github.com/ppc-ntu-khpi/GUI-Lab1-Starter/blob/master/data/test.dat) також є в цьому ж репозиторію)
+2. При виборі клієнта має виводитись інформація про всі його рахунки!
+3. Запустіть проект, впевніться, що все працює як очікувалось. Продемонстрируйте результат викладачеві.
+
+## На "п'ять"
+1. Додайте ще одну кнопку - *Report*, яка має виводити у нижній частині вікна звіт за клієнтами такого ж виду, як у роботі номер 8 (див. CustomerReport). 
 2. Запустіть проект, впевніться, що все працює як очікувалось. Продемонстрируйте результат викладачеві.
 
 
-### Код програми
-
-```java
-import com.mybank.domain.Bank;
-import com.mybank.domain.CheckingAccount;
-import com.mybank.domain.Customer;
-import com.mybank.domain.SavingsAccount;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JEditorPane;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
-public class SWINGdemo {
-
-    private final JEditorPane log;
-    private final JButton show;
-    private final JButton report;
-    private final JComboBox<String> clients;
-
-    public SWINGdemo() {
-        log = new JEditorPane("text/html", "");
-        log.setPreferredSize(new Dimension(800, 600));
-        show = new JButton("Show");
-        report = new JButton("Report");
-        clients = new JComboBox<>();
-
-        readCustomerData("C:\\Users\\kanur\\OneDrive\\Documents\\NetBeansProjects\\GUIdemo\\src\\test.dat");
-
-        for (int i = 0; i < Bank.getNumberOfCustomers(); i++) {
-            clients.addItem(Bank.getCustomer(i).getLastName() +" "+ Bank.getCustomer(i).getFirstName());
-        }
-    }
-
-    private void readCustomerData(String filename) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] data = line.split("\t");
-                if (data.length >= 3) {
-                    String firstName = data[0].trim();
-                    String lastName = data[1].trim();
-                    Bank.addCustomer(firstName, lastName);
-                    int numAccounts = Integer.parseInt(data[2].trim());
-                    for (int i = 0; i < numAccounts; i++) {
-                        line = reader.readLine();
-                        String[] accountData = line.split("\t");
-                        if (accountData.length >= 3) {
-                            String accountType = accountData[0].trim();
-                            double balance = Double.parseDouble(accountData[1].trim());
-                            double interestRate = Double.parseDouble(accountData[2].trim());
-                            if (accountType.equals("S")) {
-                                SavingsAccount savingsAccount = new SavingsAccount(balance, interestRate);
-                                Bank.getCustomer(Bank.getNumberOfCustomers() - 1).addAccount(savingsAccount);
-                            } else if (accountType.equals("C")) {
-                                double overdraftAmount = Double.parseDouble(accountData[2].trim());
-                                CheckingAccount checkingAccount = new CheckingAccount(balance, overdraftAmount);
-                                Bank.getCustomer(Bank.getNumberOfCustomers() - 1).addAccount(checkingAccount);
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("Error reading customers from file: " + e.getMessage());
-        }
-    }
-
-    private void launchFrame() {
-        JFrame frame = new JFrame("MyBank clients");
-        frame.setLayout(new BorderLayout());
-        JPanel cpane = new JPanel();
-        cpane.setLayout(new GridLayout(1, 3));
-
-        cpane.add(clients);
-        cpane.add(show);
-        cpane.add(report);
-        frame.add(cpane, BorderLayout.NORTH);
-        frame.add(log, BorderLayout.CENTER);
-
-        show.addActionListener((ActionEvent e) -> {
-            Customer current = Bank.getCustomer(clients.getSelectedIndex());
-            StringBuilder custInfo = new StringBuilder("<br>&nbsp;<b><span style=\"font-size:2em;\">")
-                    .append(current.getLastName())
-                    .append(" ")
-                    .append(current.getFirstName())
-                    .append("</span><br><hr>")
-                    .append("&nbsp;<b>Accounts:</b><br>");
-            
-            for (int i = 0; i < current.getNumberOfAccounts(); i++) {
-                String accType = current.getAccount(i) instanceof CheckingAccount ? "Checking" : "Savings";
-                custInfo.append("&nbsp;&nbsp;&nbsp;<b>Acc Type:</b> ")
-                        .append(accType)
-                        .append("<br>")
-                        .append("&nbsp;&nbsp;&nbsp;<b>Balance:</b> <span style=\"color:red;\">$")
-                        .append(current.getAccount(i).getBalance())
-                        .append("</span><br>");
-                
-            }
-            
-            log.setText(custInfo.toString());
-        });
-
-        report.addActionListener((ActionEvent e) -> {
-            StringBuilder reportInfo = new StringBuilder("<br>&nbsp;<b><span style=\"font-size:2em;\">Customer Report</span><br><hr>");
-            
-            for (int i = 0; i < Bank.getNumberOfCustomers(); i++) {
-                Customer customer = Bank.getCustomer(i);
-                reportInfo.append("&nbsp;<b>Customer:</b> ")
-                        .append(customer.getLastName())
-                        .append(" ")
-                        .append(customer.getFirstName())
-                        .append("<br>");
-                
-                for (int j = 0; j < customer.getNumberOfAccounts(); j++) {
-                    reportInfo.append("&nbsp;&nbsp;&nbsp;<b>Account Type:</b> ")
-                            .append(customer.getAccount(j) instanceof CheckingAccount ? "Checking" : "Savings")
-                            .append("<br>")
-                            .append("&nbsp;&nbsp;&nbsp;<b>Balance:</b> <span style=\"color:red;\">$")
-                            .append(customer.getAccount(j).getBalance())
-                            .append("</span><br>");
-                }
-                
-                reportInfo.append("<br>");
-            }
-            
-            log.setText(reportInfo.toString());
-        });
-
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setResizable(false);
-        frame.setVisible(true);
-    }
-
-    public static void main(String[] args) {
-        SWINGdemo demo = new SWINGdemo();
-        demo.launchFrame();
-    }
-}
-
-```
-### Скріншот роботи програми
-
-![](https://github.com/ppc-ntu-khpi/34-gui-1-katushhiaa/blob/master/Work_for_five.jpg "For five")
+[![Gitter](https://badges.gitter.im/PPC-SE-2020/OOP.svg)](https://gitter.im/PPC-SE-2020/OOP?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
